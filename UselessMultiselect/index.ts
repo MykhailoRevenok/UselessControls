@@ -2,14 +2,17 @@ import { IInputs, IOutputs } from "./generated/ManifestTypes";
 
 export class UselessMultiselect implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
-    private _outputValue: string | undefined;
-    private _defaultValue: string | undefined;
+    private _outputValue: string | null;
+    private _defaultValue: string | null;
 
     private _isReadOnly: boolean;
     private _isVisible: boolean;
 
     private _selectInput: HTMLInputElement;
     private _container: HTMLDivElement;
+
+    private phoneHead: HTMLSelectElement;
+    private phoneCore: HTMLLabelElement;
 
     //private _context: ComponentFramework.Context<IInputs>;
     //private _notifyOutputChanged: () => void;
@@ -32,6 +35,7 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
         this._defaultValue = ''; //context.parameters.ToggleAttribute.attributes ?.DefaultValue;
 
         let curentInputData = context.parameters.MultiselectAttribute.raw;
+        console.log('input', context.parameters.MultiselectAttribute.raw);
         if (curentInputData != null) {
             this._outputValue = curentInputData;
         }
@@ -44,6 +48,17 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
 
         this._container = document.createElement("div");
 
+        this.phoneHead = document.createElement("select");
+
+        var phoneHeadCode = "";
+        for (var i = 0; i < 100; i++) {
+            phoneHeadCode = "+" + i.toString().padStart(2, '0');
+            var phoneHeadOption = document.createElement('option');
+            phoneHeadOption.value = phoneHeadCode;
+            phoneHeadOption.innerHTML = phoneHeadCode;
+            this.phoneHead.options.add(phoneHeadOption);
+        }
+
         /*this._selectInput = document.createElement("input");
         this._selectInput.type = "checkbox";
         //this._toggleInput.checked = curentInputData as string;
@@ -51,14 +66,14 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
         this._selectInput.name = "cb1name";
         this._selectInput.classList.add("toggle");*/
 
-        /*var label = document.createElement("label");
-        label.htmlFor = "cb1";
-        label.textContent = "label";
-        label.classList.add("label_toggle");*/
+        this.phoneCore = document.createElement("label");
+        this.phoneCore.htmlFor = "cb1";
+        this.phoneCore.textContent = context.parameters.MultiselectAttribute.raw;
+        this.phoneCore.classList.add("label_toggle");
 
         if (!this._isVisible)
             this._container.classList.add("hidden");
-        this._selectInput.disabled = this._isReadOnly;
+        //this._selectInput.disabled = this._isReadOnly;
 
         /*label.addEventListener('click', (event) => {
             //this._outputValue = !this._toggleInput.checked;
@@ -66,8 +81,8 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
         });*/
 
         const toggleWrapper = document.createElement("div");
-        toggleWrapper.appendChild(this._selectInput);
-        //toggleWrapper.appendChild(label);
+        toggleWrapper.appendChild(this.phoneHead);
+        toggleWrapper.appendChild(this.phoneCore);
         this._container.appendChild(toggleWrapper);
         //this._container.classList.add("container");
 
@@ -83,10 +98,11 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
 	public updateView(context: ComponentFramework.Context<IInputs>): void
 	{
         // Add code to update control view
-        /*if (context.parameters.MultiselectAttribute.raw != this._outputValue) {
+        if (context.parameters.MultiselectAttribute.raw != this._outputValue) {
             this._outputValue = context.parameters.MultiselectAttribute.raw;
+            this.phoneCore.textContent = this._outputValue;
             //this._toggleInput.checked = this._outputValue;
-        }*/
+        }
 
         if (context.mode.isVisible != this._isVisible) {
             this._isVisible = context.mode.isVisible;
