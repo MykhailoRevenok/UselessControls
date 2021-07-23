@@ -1,14 +1,14 @@
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
 
-export class UselessToggle implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class UselessMultiselect implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
-    private _outputValue: boolean | undefined;
-    private _defaultValue: boolean | undefined;
+    private _outputValue: string | undefined;
+    private _defaultValue: string | undefined;
 
     private _isReadOnly: boolean;
     private _isVisible: boolean;
 
-    private _toggleInput: HTMLInputElement;
+    private _selectInput: HTMLInputElement;
     private _container: HTMLDivElement;
 
     //private _context: ComponentFramework.Context<IInputs>;
@@ -29,9 +29,9 @@ export class UselessToggle implements ComponentFramework.StandardControl<IInputs
 	 */
     public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container: HTMLDivElement): void {
         // Add control initialization code        
-        this._defaultValue = false; //context.parameters.ToggleAttribute.attributes ?.DefaultValue;
+        this._defaultValue = ''; //context.parameters.ToggleAttribute.attributes ?.DefaultValue;
 
-        let curentInputData = context.parameters.ToggleAttribute.raw;
+        let curentInputData = context.parameters.MultiselectAttribute.raw;
         if (curentInputData != null) {
             this._outputValue = curentInputData;
         }
@@ -44,32 +44,30 @@ export class UselessToggle implements ComponentFramework.StandardControl<IInputs
 
         this._container = document.createElement("div");
 
-        this._toggleInput = document.createElement("input");
-        this._toggleInput.type = "checkbox";
-        this._toggleInput.checked = curentInputData as boolean;
-        this._toggleInput.id = "cb1";
-        this._toggleInput.name = "cb1name";
-        this._toggleInput.classList.add("toggle");
+        /*this._selectInput = document.createElement("input");
+        this._selectInput.type = "checkbox";
+        //this._toggleInput.checked = curentInputData as string;
+        this._selectInput.id = "cb1";
+        this._selectInput.name = "cb1name";
+        this._selectInput.classList.add("toggle");*/
 
-        var label = document.createElement("label");
+        /*var label = document.createElement("label");
         label.htmlFor = "cb1";
         label.textContent = "label";
-        label.classList.add("label_toggle");
+        label.classList.add("label_toggle");*/
 
         if (!this._isVisible)
             this._container.classList.add("hidden");
-        this._toggleInput.disabled = this._isReadOnly;
+        this._selectInput.disabled = this._isReadOnly;
 
-        label.addEventListener('click', (event) => {
-            this._outputValue = !this._toggleInput.checked;
+        /*label.addEventListener('click', (event) => {
+            //this._outputValue = !this._toggleInput.checked;
             notifyOutputChanged();
-        });
+        });*/
 
         const toggleWrapper = document.createElement("div");
-        //toggleWrapper.className = "pretty p-switch p-fill";
-        //toggleWrapper.className = "mt-check-garden";
-        toggleWrapper.appendChild(this._toggleInput);
-        toggleWrapper.appendChild(label);
+        toggleWrapper.appendChild(this._selectInput);
+        //toggleWrapper.appendChild(label);
         this._container.appendChild(toggleWrapper);
         //this._container.classList.add("container");
 
@@ -85,10 +83,10 @@ export class UselessToggle implements ComponentFramework.StandardControl<IInputs
 	public updateView(context: ComponentFramework.Context<IInputs>): void
 	{
         // Add code to update control view
-        if (context.parameters.ToggleAttribute.raw != this._outputValue) {
-            this._outputValue = context.parameters.ToggleAttribute.raw;
-            this._toggleInput.checked = this._outputValue;
-        }
+        /*if (context.parameters.MultiselectAttribute.raw != this._outputValue) {
+            this._outputValue = context.parameters.MultiselectAttribute.raw;
+            //this._toggleInput.checked = this._outputValue;
+        }*/
 
         if (context.mode.isVisible != this._isVisible) {
             this._isVisible = context.mode.isVisible;
@@ -108,7 +106,7 @@ export class UselessToggle implements ComponentFramework.StandardControl<IInputs
     {
         console.log(1);
         return {
-            ToggleAttribute: this._outputValue
+            //MultiselectAttribute: this._outputValue
         };
 	}
 
