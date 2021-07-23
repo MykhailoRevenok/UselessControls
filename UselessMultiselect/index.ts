@@ -1,4 +1,5 @@
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
+import { clearInterval } from "timers";
 
 export class UselessMultiselect implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
@@ -13,6 +14,10 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
 
     private phoneHead: HTMLSelectElement;
     private phoneCore: HTMLLabelElement;
+    private buttonStart: HTMLButtonElement;
+    private buttonStop: HTMLButtonElement;
+
+    private timerId: NodeJS.Timeout;
 
     //private _context: ComponentFramework.Context<IInputs>;
     //private _notifyOutputChanged: () => void;
@@ -59,17 +64,31 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
             this.phoneHead.options.add(phoneHeadOption);
         }
 
-        /*this._selectInput = document.createElement("input");
-        this._selectInput.type = "checkbox";
-        //this._toggleInput.checked = curentInputData as string;
-        this._selectInput.id = "cb1";
-        this._selectInput.name = "cb1name";
-        this._selectInput.classList.add("toggle");*/
-
         this.phoneCore = document.createElement("label");
-        this.phoneCore.htmlFor = "cb1";
         this.phoneCore.textContent = context.parameters.MultiselectAttribute.raw;
-        this.phoneCore.classList.add("label_toggle");
+        this.phoneCore.id = "buttonStart";
+
+        function randomNumber() {
+            let num: number = Math.round(Math.random() * 10000000000);
+            let label = document.getElementById("buttonStart");
+            if (label) {
+                label.innerHTML = num.toString();
+            }
+        }
+        
+        this.buttonStart = document.createElement('button');
+        this.buttonStart.type = "button";
+        this.buttonStart.textContent = "Start";
+        this.buttonStart.addEventListener('click', (event) => {
+            this.timerId = setInterval(randomNumber, 100);
+        });
+
+        this.buttonStop = document.createElement('button');
+        this.buttonStop.type = "button";
+        this.buttonStop.textContent = "Stop";
+        this.buttonStop.addEventListener('click', (event) => {
+            clearInterval(this.timerId);
+        });
 
         if (!this._isVisible)
             this._container.classList.add("hidden");
@@ -83,6 +102,8 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
         const toggleWrapper = document.createElement("div");
         toggleWrapper.appendChild(this.phoneHead);
         toggleWrapper.appendChild(this.phoneCore);
+        toggleWrapper.appendChild(this.buttonStart);
+        toggleWrapper.appendChild(this.buttonStop);
         this._container.appendChild(toggleWrapper);
         //this._container.classList.add("container");
 
