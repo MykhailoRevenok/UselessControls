@@ -1,7 +1,7 @@
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import { clearInterval } from "timers";
 
-export class UselessMultiselect implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class UselessPhone implements ComponentFramework.StandardControl<IInputs, IOutputs> {
 
     private _outputValue: string | null;
     private _defaultValue: string | null;
@@ -14,10 +14,7 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
 
     private phoneHead: HTMLSelectElement;
     private phoneCore: HTMLLabelElement;
-    private buttonStart: HTMLButtonElement;
-    private buttonStop: HTMLButtonElement;
-
-    private timerId: NodeJS.Timeout;
+    private buttonGuess: HTMLButtonElement;
 
     //private _context: ComponentFramework.Context<IInputs>;
     //private _notifyOutputChanged: () => void;
@@ -39,8 +36,8 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
         // Add control initialization code        
         this._defaultValue = ''; //context.parameters.ToggleAttribute.attributes ?.DefaultValue;
 
-        let curentInputData = context.parameters.MultiselectAttribute.raw;
-        console.log('input', context.parameters.MultiselectAttribute.raw);
+        let curentInputData = context.parameters.PhoneAttribute.raw;
+
         if (curentInputData != null) {
             this._outputValue = curentInputData;
         }
@@ -54,6 +51,8 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
         this._container = document.createElement("div");
 
         this.phoneHead = document.createElement("select");
+        this.phoneHead.classList.add('selectElement');
+        this.phoneHead.id = 'phoneHead';
 
         var phoneHeadCode = "";
         for (var i = 0; i < 100; i++) {
@@ -64,46 +63,55 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
             this.phoneHead.options.add(phoneHeadOption);
         }
 
-        this.phoneCore = document.createElement("label");
-        this.phoneCore.textContent = context.parameters.MultiselectAttribute.raw;
-        this.phoneCore.id = "buttonStart";
+        this.phoneHead.addEventListener('change', (event) => {
+            this._outputValue = this.phoneHead.value + this.phoneCore.textContent;
+            notifyOutputChanged();
 
-        function randomNumber() {
-            let num: number = Math.round(Math.random() * 10000000000);
-            let label = document.getElementById("buttonStart");
-            if (label) {
-                label.innerHTML = num.toString();
-            }
-        }
+        })
         
-        this.buttonStart = document.createElement('button');
-        this.buttonStart.type = "button";
-        this.buttonStart.textContent = "Start";
-        this.buttonStart.addEventListener('click', (event) => {
-            this.timerId = setInterval(randomNumber, 100);
-        });
 
-        this.buttonStop = document.createElement('button');
-        this.buttonStop.type = "button";
-        this.buttonStop.textContent = "Stop";
-        this.buttonStop.addEventListener('click', (event) => {
-            clearInterval(this.timerId);
+        this.phoneCore = document.createElement("label");
+        this.phoneCore.textContent = context.parameters.PhoneAttribute.raw;
+        this.phoneCore.textContent = "0000000000";
+        this.phoneCore.id = "phoneCore";
+        
+        this.buttonGuess = document.createElement('button');
+        this.buttonGuess.type = "button";
+        this.buttonGuess.id = 'buttonGuess';
+        this.buttonGuess.textContent = "I'm Feeling Lucky";
+        this.buttonGuess.addEventListener('click', (event) => {
+            let num: number = Math.round(Math.random() * 10000000000);
+            let stringNumber = num.toString();
+            if (stringNumber.length < 10) {
+                for (let i = 0; i < 10 - stringNumber.length; i++) {
+                    stringNumber = '0' + stringNumber;
+                }
+            }
+
+            let label = document.getElementById("phoneCore");
+            if (label) {
+                label.innerHTML = stringNumber;
+            }
+
+            this._outputValue = this.phoneHead.value + this.phoneCore.textContent;
+            notifyOutputChanged();
         });
 
         if (!this._isVisible)
             this._container.classList.add("hidden");
         //this._selectInput.disabled = this._isReadOnly;
 
-        /*label.addEventListener('click', (event) => {
-            //this._outputValue = !this._toggleInput.checked;
-            notifyOutputChanged();
-        });*/
+        let phoneHeadDiv = document.createElement("div");
+        phoneHeadDiv.classList.add('selectDiv');
+        phoneHeadDiv.appendChild(this.phoneHead);
+        let phoneCoreDiv = document.createElement("div");
+        phoneCoreDiv.classList.add('labelDiv');
+        phoneCoreDiv.appendChild(this.phoneCore);
 
         const toggleWrapper = document.createElement("div");
-        toggleWrapper.appendChild(this.phoneHead);
-        toggleWrapper.appendChild(this.phoneCore);
-        toggleWrapper.appendChild(this.buttonStart);
-        toggleWrapper.appendChild(this.buttonStop);
+        toggleWrapper.appendChild(phoneHeadDiv);
+        toggleWrapper.appendChild(phoneCoreDiv);
+        toggleWrapper.appendChild(this.buttonGuess);
         this._container.appendChild(toggleWrapper);
         //this._container.classList.add("container");
 
@@ -119,9 +127,9 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
 	public updateView(context: ComponentFramework.Context<IInputs>): void
 	{
         // Add code to update control view
-        if (context.parameters.MultiselectAttribute.raw != this._outputValue) {
-            this._outputValue = context.parameters.MultiselectAttribute.raw;
-            this.phoneCore.textContent = this._outputValue;
+        if (context.parameters.PhoneAttribute.raw != this._outputValue) {
+            //this._outputValue = context.parameters.PhoneAttribute.raw;
+            //this.phoneCore.textContent = this._outputValue;
             //this._toggleInput.checked = this._outputValue;
         }
 
@@ -141,9 +149,12 @@ export class UselessMultiselect implements ComponentFramework.StandardControl<II
 	 */
 	public getOutputs(): IOutputs
     {
-        console.log(1);
+        let outAttribute = "";
+        if (this._outputValue !== null)
+            outAttribute = this._outputValue;
+
         return {
-            //MultiselectAttribute: this._outputValue
+            PhoneAttribute: outAttribute
         };
 	}
 

@@ -5,7 +5,7 @@
 }
 
     .toggle:checked + label {
-        background: #c7123d;
+        background: #d1004b;
         left: 195px;
     }
 
